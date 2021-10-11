@@ -1,0 +1,167 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+option go_package = ".;IoT";
+
+package proto;
+
+message Empty{}
+
+// Device
+
+enum DeviceType{
+  ARDUINO = 0;
+  RASPBERRYPI = 1;
+  PLC_Siemens = 2;
+  PLC_Beckhoff = 3;
+  PLC_WAGO = 4;
+  OPC = 5;
+}
+
+message Device{
+  uint32 ID = 1;
+  string Name = 2;
+  string Location = 3;
+  DeviceType DeviceType = 4;
+  string IPAddress = 5;
+  string Gateway = 6;
+  string SubnetMask = 7;
+  string OPCUrl = 8;
+}
+
+// Sensor
+
+enum SensorDataType{
+  BOOL = 0;
+  BYTE = 1;
+  INT = 2;
+  FLOAT = 3;
+  DOUBLE = 4;
+  STRING = 5;
+  DATETIME = 6;
+}
+
+enum GPIOType{
+  Input = 0;
+  Output = 1;
+  AnalogInput = 2;
+  AnalogOutput = 3;
+}
+
+enum PLCDataArea{
+  DB = 0;
+  MK = 1;
+  PE = 2;
+  PA = 3;
+  CT = 4;
+}
+
+message Sensor{
+  uint32 ID = 1;
+  uint32 DeviceID = 2;
+  string Name = 3;
+  string Location = 4;
+  SensorDataType DataType = 5;
+  // Arduino RaspberryPi
+  int32 GPIONum = 6;
+  GPIOType GPIOType = 7;
+  bool PullUpResistor = 8;
+  // PLC
+  PLCDataArea PLCDataArea = 9;
+  int32 DataOffset = 10;
+  int32 BoolIndex = 11;
+  int32 DbNum = 12;
+  // OPC
+  string NodeID = 13;
+}
+
+// Record
+
+enum RecordType{
+  EQUAL = 0;
+  ODD = 1;
+  SMALLER_THEN = 2;
+  BIGGER_THEN = 3;
+  RANGE = 4;
+  ALWAYS = 5;
+}
+
+message Record{
+  uint32 ID = 1;
+  uint32 DeviceID = 2;
+  string Name = 3;
+  bool Running = 4;
+  repeated RecordSensor RecordSensor = 5;
+}
+
+message RecordSensor{
+  uint32 SensorID = 1;
+  RecordType RecordType = 2;
+  string TriggerValueMin = 3;
+  string TriggerValueMax = 4;
+  double interval = 5; // Represent in seconds
+}
+
+message RecordData{
+  uint32 ID = 1;
+  uint32 SensorID = 2;
+  SensorDataType DataType = 3;
+  string Value = 4;
+  google.protobuf.Timestamp Timestamp = 5;
+}
+
+enum FilterTime{
+  NOW = 0;
+  LAST_24H = 1;
+  LAST_WEEK = 2;
+  LAST_MONTH = 3;
+  LAST_3MONTH = 4;
+  LAST_6MONTH = 5;
+  LAST_YEAR = 6;
+  ALL = 7;
+}
+
+enum FilterValue{
+  EQUAL_VALUE = 0;
+  ODD_VALUE = 1;
+  SMALLER_THEN_VALUE = 2;
+  BIGGER_THEN_VALUE = 3;
+  RANGE_VALUE = 4;
+  ALL_VALUE = 5;
+}
+
+message RecordDataFilter{
+  uint32 ID = 1;
+  uint32 SensorID = 2;
+  FilterValue FilterValue = 3;
+  string MinValue = 4;
+  string MaxValue = 6;
+  FilterTime FilterTime = 8;
+}
+
+
+
+
+service IoTService{
+  // Device
+  rpc CreateDevice(Device)returns(Empty){};
+  rpc UpdateDevice(Device)returns(Empty){};
+  rpc DeleteDevice(Device)returns(Empty){};
+  rpc GetDevice(Device) returns(Device){};
+  rpc GetDevices(Empty) returns(stream Device){};
+  // Sensor
+  rpc CreateSensor(Sensor)returns(Empty){};
+  rpc UpdateSensor(Sensor)returns(Empty){};
+  rpc DeleteSensor(Sensor)returns(Empty){};
+  rpc GetSensor(Sensor) returns(Sensor){};
+  rpc GetSensors(Device) returns(stream Sensor){};
+  // Record
+  rpc CreateRecord(Record)returns(Empty){};
+  rpc UpdateRecord(Record)returns(Empty){};
+  rpc DeleteRecord(Record)returns(Empty){};
+  rpc GetRecord(Record) returns(Record){};
+  rpc GetRecords(Device) returns(stream Record){};
+  rpc CreateRecordData(RecordData) returns(Empty){};
+  rpc GetRecordData(RecordDataFilter) returns(stream RecordData){};
+  rpc DeleteRecordData(RecordData) returns(Empty){};
+
+}

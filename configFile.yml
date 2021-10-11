@@ -1,0 +1,18 @@
+db:
+  host: "localhost"
+  port: "5433"
+  dialect: "postgres"
+  user: "postgres"
+  db_name: "IoT"
+  password: "postgres"
+
+gRPC:
+  host: "localhost"
+  port: "50051"
+  network_type: "tcp"
+
+api:
+  host: "localhost"
+  port: "8080"
+  gRPCHost: "localhost"
+  gRPCPort: "50051"
