@@ -355,7 +355,7 @@ POST http://localhost:8080/record
 // Update Record:
 PATCH http://localhost:8080/record
 {
-    "ID": 1
+    "ID": 1,
     "Name": "Temperature_Kitchen_Changed...",
     "Running": false,
 }
@@ -369,7 +369,7 @@ GET http://localhost:8080/record
 {"ID":1} // "RecordID"
 // Response:
 {
-    "ID":1
+    "ID":1,
     "DeviceID": 1,
     "Name": "Temperature_Kitchen",
     "Running": true,
@@ -396,7 +396,7 @@ GET http://localhost:8080/records
 {"ID":1} // "DeviceID"
 // Response [STREAM]:
 {
-    "ID":1
+    "ID":1,
     "DeviceID": 1,
     "Name": "Temperature_Kitchen",
     "Running": true,
