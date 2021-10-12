@@ -20,7 +20,7 @@ Written in  Go.
 * Configure the "configFile.yml".
 * Run the IoT_Service.
 
-#### Simple Connection configuration:
+#### Simple connection configuration:
 configFile.yml
 ```yaml
 db:
