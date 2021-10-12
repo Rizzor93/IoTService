@@ -126,27 +126,15 @@ func (d *DB) CreateRecord(record *models.Record) error {
 }
 
 func (d *DB) UpdateRecord(record *models.Record) error {
+	if err := d.db.Where("record_id = ?", record.ID).Delete(&models.RecordSensor{}).Error; err != nil {
+		return err
+	}
+
 	for _, sensor := range record.RecordSensor {
-		var newValues = sensor
-		err := d.db.Where("sensor_id = ? AND record_id = ?", sensor.SensorID, sensor.RecordID).Find(&newValues).Error
-		if err != nil {
-			return err
-		}
-
-		err = d.db.Where("sensor_id = ? AND record_id = ?", sensor.SensorID, sensor.RecordID).
-			Model(&newValues).Updates(map[string]interface{}{
-			"sensor_id":         sensor.SensorID,
-			"record_type":       sensor.RecordType,
-			"trigger_value_min": sensor.TriggerValueMin,
-			"trigger_value_max": sensor.TriggerValueMax,
-			"interval":          sensor.Interval,
-		}).Error
-
-		if err != nil {
+		if err := d.db.Create(&sensor).Error; err != nil {
 			return err
 		}
 	}
-
 	if err := d.db.Model(&models.Record{}).Where("id = ?", record.ID).
 		Update("name", record.Name).Error; err != nil {
 		return err
