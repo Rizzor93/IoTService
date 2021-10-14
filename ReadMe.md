@@ -456,7 +456,7 @@ GET http://localhost:8080/record_data
 you can build your own gRPC-Client in the project-folder contains the
 ".proto"-file. (Examples coming soon.)
 
-You can look for inspiration in [routes](./server/services/routes.go)
+You can look for inspiration in [routes](./server/services/gRPC/routes.go)
 
 or look on [gRPC](https://grpc.io/)
 
