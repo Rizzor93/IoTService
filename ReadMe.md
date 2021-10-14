@@ -10,13 +10,13 @@ Written in  Go.
 ### How to use ?
 
 * ##### run the commands in root folder:
-    #### Dependency: min. Go 1.14.7 https://golang.org/
+    #### Dependency: [Go 1.14.7]( https://golang.org/).
 
         go mod init IoT_Service
         go get
         go build
 
-* Create a Docker Container with "PostgreSQL". https://hub.docker.com/_/postgres
+* Create a Docker Container with ["PostgreSQL"](https://hub.docker.com/_/postgres).
 * Configure the "configFile.yml".
 * Run the IoT_Service.
 
@@ -456,12 +456,12 @@ GET http://localhost:8080/record_data
 you can build your own gRPC-Client in the project-folder contains the
 ".proto"-file. (Examples coming soon.)
 
-You can look for inspiration in "project-folder/server/services/routes.go"
+You can look for inspiration in [routes](./server/services/routes.go)
 
-or look on https://grpc.io/
+or look on [gRPC](https://grpc.io/)
 
 Test the gRPC-Server with
-https://kreya.app/
+[Kreya](https://kreya.app/)
 
 
 ## Tasks:
