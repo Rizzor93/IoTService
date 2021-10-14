@@ -453,8 +453,7 @@ GET http://localhost:8080/record_data
 ````
 ## gRPC-Client
 
-you can build your own gRPC-Client in the project-folder contains the
-".proto"-file. (Examples coming soon.)
+you can build your own gRPC-Client in the project-folder contains [ProtoFile](./proto/IoT.proto) (Examples coming soon.)
 
 You can look for inspiration in [routes](./server/services/gRPC/routes.go)
 
