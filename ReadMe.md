@@ -474,7 +474,7 @@ Test the gRPC-Server with
     - [ ] OPC
 - [ ] Add secure option
 
-- [ ] Add Repository IoT_Manager
+- [x] Add Repository [IoT_Manager](https://github.com/Rizzor93/IoTManager)
   * in work.
   * written in C++ with Qt.
 
