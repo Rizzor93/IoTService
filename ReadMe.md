@@ -2,7 +2,7 @@
 A backend service to collect data from devices.\
 Written in  Go.
 
-### Contains: 
+### Contains:
 * DatabaseHandler
 * gRPC-Server
 * RestAPI-Server
@@ -17,11 +17,11 @@ Written in  Go.
         go build
 
 * Create a Docker Container with ["PostgreSQL"](https://hub.docker.com/_/postgres).
-* Configure the "configFile.yml".
+* Configure the [configFile](./configFile.yml).
 * Run the IoT_Service.
 
 #### Simple connection configuration:
-configFile.yml
+[configFile](./configFile.yml)
 ```yaml
 db:
   host: "localhost"
@@ -480,4 +480,3 @@ Test the gRPC-Server with
 
 ## Schema Application
 ![](./images/schema.png)
-
