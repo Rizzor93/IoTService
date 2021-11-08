@@ -223,58 +223,6 @@ func (d *DB) GetRecordData(record *models.RecordDataFilter) ([]*models.RecordDat
 
 	var recordData []*models.RecordData
 
-	switch record.FilterValue {
-	case models.AllValue:
-		if err := d.db.Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-	case models.EqualValue:
-		if err := d.db.Where("value = ?", record.MinValue).Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-	case models.OddValue:
-		if err := d.db.Where("value != ?", record.MinValue).Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-	case models.SmallerThenValue:
-		if err := d.db.Where("value < ?", record.MinValue).Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-	case models.BiggerThenValue:
-		if err := d.db.Where("value > ?", record.MinValue).Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-	case models.RangeValue:
-		if err := d.db.Where("value > ? AND value < ?", record.MinValue, record.MaxValue).Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-	default:
-		if err := d.db.Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-	}
-
 	switch record.FilterTime {
 	case models.All:
 		if err := d.db.Find(&recordData, &models.RecordData{
@@ -283,6 +231,7 @@ func (d *DB) GetRecordData(record *models.RecordDataFilter) ([]*models.RecordDat
 		}).Error; err != nil {
 			return nil, err
 		}
+		break
 	case models.Now:
 		if err := d.db.Where("created_at = ?", time.Now().UTC()).
 			Find(&recordData, &models.RecordData{
@@ -291,6 +240,7 @@ func (d *DB) GetRecordData(record *models.RecordDataFilter) ([]*models.RecordDat
 			}).Error; err != nil {
 			return nil, err
 		}
+		break
 	case models.Last24H:
 		if err := d.db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LAST24H).
 			Find(&recordData, &models.RecordData{
@@ -299,6 +249,7 @@ func (d *DB) GetRecordData(record *models.RecordDataFilter) ([]*models.RecordDat
 			}).Error; err != nil {
 			return nil, err
 		}
+		break
 	case models.LastWeek:
 		if err := d.db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LASTWEEK).
 			Find(&recordData, &models.RecordData{
@@ -307,6 +258,7 @@ func (d *DB) GetRecordData(record *models.RecordDataFilter) ([]*models.RecordDat
 			}).Error; err != nil {
 			return nil, err
 		}
+		break
 	case models.LastMonth:
 		if err := d.db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LASTMONTH).
 			Find(&recordData, &models.RecordData{
@@ -315,6 +267,7 @@ func (d *DB) GetRecordData(record *models.RecordDataFilter) ([]*models.RecordDat
 			}).Error; err != nil {
 			return nil, err
 		}
+		break
 	case models.Last3MONTH:
 		if err := d.db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LAST3MONTH).
 			Find(&recordData, &models.RecordData{
@@ -323,6 +276,7 @@ func (d *DB) GetRecordData(record *models.RecordDataFilter) ([]*models.RecordDat
 			}).Error; err != nil {
 			return nil, err
 		}
+		break
 	case models.Last6MONTH:
 		if err := d.db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LAST6MONTH).
 			Find(&recordData, &models.RecordData{
@@ -331,6 +285,7 @@ func (d *DB) GetRecordData(record *models.RecordDataFilter) ([]*models.RecordDat
 			}).Error; err != nil {
 			return nil, err
 		}
+		break
 	case models.LastYear:
 		if err := d.db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LASTYEAR).
 			Find(&recordData, &models.RecordData{
@@ -339,6 +294,7 @@ func (d *DB) GetRecordData(record *models.RecordDataFilter) ([]*models.RecordDat
 			}).Error; err != nil {
 			return nil, err
 		}
+		break
 	default:
 		if err := d.db.Find(&recordData, &models.RecordData{
 			RecordID: record.ID,
@@ -346,6 +302,66 @@ func (d *DB) GetRecordData(record *models.RecordDataFilter) ([]*models.RecordDat
 		}).Error; err != nil {
 			return nil, err
 		}
+		break
+	}
+
+	switch record.FilterValue {
+	case models.AllValue:
+		if err := d.db.Find(&recordData, &models.RecordData{
+			RecordID: record.ID,
+			SensorID: record.SensorID,
+		}).Error; err != nil {
+			return nil, err
+		}
+		break
+	case models.EqualValue:
+		if err := d.db.Where("value = ?", record.MinValue).Find(&recordData, &models.RecordData{
+			RecordID: record.ID,
+			SensorID: record.SensorID,
+		}).Error; err != nil {
+			return nil, err
+		}
+		break
+	case models.OddValue:
+		if err := d.db.Where("value != ?", record.MinValue).Find(&recordData, &models.RecordData{
+			RecordID: record.ID,
+			SensorID: record.SensorID,
+		}).Error; err != nil {
+			return nil, err
+		}
+		break
+	case models.SmallerThenValue:
+		if err := d.db.Where("value < ?", record.MinValue).Find(&recordData, &models.RecordData{
+			RecordID: record.ID,
+			SensorID: record.SensorID,
+		}).Error; err != nil {
+			return nil, err
+		}
+		break
+	case models.BiggerThenValue:
+		if err := d.db.Where("value > ?", record.MinValue).Find(&recordData, &models.RecordData{
+			RecordID: record.ID,
+			SensorID: record.SensorID,
+		}).Error; err != nil {
+			return nil, err
+		}
+		break
+	case models.RangeValue:
+		if err := d.db.Where("value > ? AND value < ?", record.MinValue, record.MaxValue).Find(&recordData, &models.RecordData{
+			RecordID: record.ID,
+			SensorID: record.SensorID,
+		}).Error; err != nil {
+			return nil, err
+		}
+		break
+	default:
+		if err := d.db.Find(&recordData, &models.RecordData{
+			RecordID: record.ID,
+			SensorID: record.SensorID,
+		}).Error; err != nil {
+			return nil, err
+		}
+		break
 	}
 
 	return recordData, nil
