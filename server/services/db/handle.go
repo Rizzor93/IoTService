@@ -2,6 +2,8 @@ package db
 
 import (
 	"IoT_Service/server/services/db/models"
+	"fmt"
+	"github.com/jinzhu/gorm"
 	"time"
 )
 
@@ -214,155 +216,19 @@ func (d *DB) GetRecordData(record *models.RecordDataFilter) ([]*models.RecordDat
 		return nil, err
 	}
 
-	var LAST24H = time.Now().UTC().Add(-(time.Hour * 24))
-	var LASTWEEK = time.Now().UTC().Add(-((time.Hour * 24) * 7))
-	var LASTMONTH = time.Now().UTC().Add(-(((time.Hour * 24) * 7) * 4))
-	var LAST3MONTH = time.Now().UTC().Add(-((((time.Hour * 24) * 7) * 4) * 3))
-	var LAST6MONTH = time.Now().UTC().Add(-((((time.Hour * 24) * 7) * 4) * 6))
-	var LASTYEAR = time.Now().UTC().Add(-((((time.Hour * 24) * 7) * 4) * 12))
+	sensor := models.Sensor{
+		ID: record.SensorID,
+	}
+	if err := d.GetSensor(&sensor); err != nil {
+		return nil, err
+	}
 
 	var recordData []*models.RecordData
-
-	switch record.FilterTime {
-	case models.All:
-		if err := d.db.Find(&recordData, &models.RecordData{
+	d.db.Scopes(filterTime(record.FilterTime), filterValue(sensor.DataType, record.FilterValue, record.MinValue, record.MaxValue)).
+		Find(&recordData, &models.RecordData{
 			RecordID: record.ID,
 			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-		break
-	case models.Now:
-		if err := d.db.Where("created_at = ?", time.Now().UTC()).
-			Find(&recordData, &models.RecordData{
-				RecordID: record.ID,
-				SensorID: record.SensorID,
-			}).Error; err != nil {
-			return nil, err
-		}
-		break
-	case models.Last24H:
-		if err := d.db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LAST24H).
-			Find(&recordData, &models.RecordData{
-				RecordID: record.ID,
-				SensorID: record.SensorID,
-			}).Error; err != nil {
-			return nil, err
-		}
-		break
-	case models.LastWeek:
-		if err := d.db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LASTWEEK).
-			Find(&recordData, &models.RecordData{
-				RecordID: record.ID,
-				SensorID: record.SensorID,
-			}).Error; err != nil {
-			return nil, err
-		}
-		break
-	case models.LastMonth:
-		if err := d.db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LASTMONTH).
-			Find(&recordData, &models.RecordData{
-				RecordID: record.ID,
-				SensorID: record.SensorID,
-			}).Error; err != nil {
-			return nil, err
-		}
-		break
-	case models.Last3MONTH:
-		if err := d.db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LAST3MONTH).
-			Find(&recordData, &models.RecordData{
-				RecordID: record.ID,
-				SensorID: record.SensorID,
-			}).Error; err != nil {
-			return nil, err
-		}
-		break
-	case models.Last6MONTH:
-		if err := d.db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LAST6MONTH).
-			Find(&recordData, &models.RecordData{
-				RecordID: record.ID,
-				SensorID: record.SensorID,
-			}).Error; err != nil {
-			return nil, err
-		}
-		break
-	case models.LastYear:
-		if err := d.db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LASTYEAR).
-			Find(&recordData, &models.RecordData{
-				RecordID: record.ID,
-				SensorID: record.SensorID,
-			}).Error; err != nil {
-			return nil, err
-		}
-		break
-	default:
-		if err := d.db.Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-		break
-	}
-
-	switch record.FilterValue {
-	case models.AllValue:
-		if err := d.db.Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-		break
-	case models.EqualValue:
-		if err := d.db.Where("value = ?", record.MinValue).Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-		break
-	case models.OddValue:
-		if err := d.db.Where("value != ?", record.MinValue).Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-		break
-	case models.SmallerThenValue:
-		if err := d.db.Where("value < ?", record.MinValue).Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-		break
-	case models.BiggerThenValue:
-		if err := d.db.Where("value > ?", record.MinValue).Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-		break
-	case models.RangeValue:
-		if err := d.db.Where("value > ? AND value < ?", record.MinValue, record.MaxValue).Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-		break
-	default:
-		if err := d.db.Find(&recordData, &models.RecordData{
-			RecordID: record.ID,
-			SensorID: record.SensorID,
-		}).Error; err != nil {
-			return nil, err
-		}
-		break
-	}
+		})
 
 	return recordData, nil
 }
@@ -380,4 +246,78 @@ func (d *DB) DeleteRecordData(record *models.RecordData) error {
 	}
 
 	return nil
+}
+
+func filterTime(filterTime models.FilterTime) func(db *gorm.DB) *gorm.DB {
+	var LAST24H = time.Now().UTC().Add(-(time.Hour * 24))
+	var LASTWEEK = time.Now().UTC().Add(-((time.Hour * 24) * 7))
+	var LASTMONTH = time.Now().UTC().Add(-(((time.Hour * 24) * 7) * 4))
+	var LAST3MONTH = time.Now().UTC().Add(-((((time.Hour * 24) * 7) * 4) * 3))
+	var LAST6MONTH = time.Now().UTC().Add(-((((time.Hour * 24) * 7) * 4) * 6))
+	var LASTYEAR = time.Now().UTC().Add(-((((time.Hour * 24) * 7) * 4) * 12))
+
+	return func(db *gorm.DB) *gorm.DB {
+		switch filterTime {
+		case models.All:
+			return db.Where("")
+		case models.Now:
+			return db.Where("created_at = ?", time.Now().UTC())
+		case models.Last24H:
+			return db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LAST24H)
+		case models.LastWeek:
+			return db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LASTWEEK)
+		case models.LastMonth:
+			return db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LASTMONTH)
+		case models.Last3MONTH:
+			return db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LAST3MONTH)
+		case models.Last6MONTH:
+			return db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LAST6MONTH)
+		case models.LastYear:
+			return db.Where("created_at < ? AND created_at > ?", time.Now().UTC(), LASTYEAR)
+		default:
+			return db.Where("")
+		}
+	}
+}
+
+func castType(dataType models.SensorDataType) string {
+	switch dataType {
+	case models.SensorDataType_BOOL:
+		return "INTEGER"
+	case models.SensorDataType_BYTE:
+		return "BYTEA"
+	case models.SensorDataType_INT:
+		return "INTEGER"
+	case models.SensorDataType_FLOAT:
+		return "FLOAT"
+	case models.SensorDataType_DOUBLE:
+		return "DOUBLE PRECISION"
+	case models.SensorDataType_STRING:
+		return "TEXT"
+	case models.SensorDataType_DATETIME:
+		return "DATE"
+	default:
+		return "TEXT"
+	}
+}
+
+func filterValue(dataType models.SensorDataType, comp models.FilterValue, minValue string, maxValue string) func(db *gorm.DB) *gorm.DB {
+	return func(db *gorm.DB) *gorm.DB {
+		switch comp {
+		case models.AllValue:
+			return db.Where("")
+		case models.EqualValue:
+			return db.Where(fmt.Sprintf("CAST(value AS %s) = %s ", castType(dataType), minValue))
+		case models.OddValue:
+			return db.Where(fmt.Sprintf("CAST(value AS %s) != %s ", castType(dataType), minValue))
+		case models.SmallerThenValue:
+			return db.Where(fmt.Sprintf("CAST(value AS %s) < %s ", castType(dataType), minValue))
+		case models.BiggerThenValue:
+			return db.Where(fmt.Sprintf("CAST(value AS %s) > %s ", castType(dataType), minValue))
+		case models.RangeValue:
+			return db.Where(fmt.Sprintf("CAST(value AS %s) > %s AND CAST(value AS %s) < %s", castType(dataType), minValue, castType(dataType), maxValue))
+		default:
+			return db.Where("")
+		}
+	}
 }
